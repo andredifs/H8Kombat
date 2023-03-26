@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+from main import main
 
 # Aqui poderemos colocar o código que será executado quando o comando "run" for chamado
 # Futuramente poderemos colocar mais flags para o comando "run", exemplos:
@@ -8,6 +9,6 @@ from argparse import ArgumentParser, Namespace
 def run(parser: ArgumentParser):
     def _run(_: Namespace):
         print('Running game...')
+        main()
 
     parser.set_defaults(func=_run)
-

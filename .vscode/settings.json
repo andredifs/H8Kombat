@@ -1,0 +1,17 @@
+{
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/include"
+    ],
+    "python.envFile": "${workspaceFolder}/.venv",
+    "python.formatting.provider": "autopep8",
+    "editor.formatOnSave": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.banditEnabled": false,
+    "python.linting.mypyEnabled": false,
+    "python.linting.prospectorEnabled": false,
+    "python.linting.pylamaEnabled": false,
+    "python.linting.pydocstyleEnabled": false,
+    "python.linting.pycodestyleEnabled": false,
+    "python.linting.lintOnSave": true,
+}
