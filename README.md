@@ -8,7 +8,20 @@ Este é um jogo de luta simples criado em Pygame.
 (Em breve)
 
 ### COMO EXECUTAR O JOGO:
-(Em breve)
+```bash
+py game.py run
+```
 
-### CRÉDITOS:
-(Em breve)
+### Estrutura do projeto
+```
+.
+├── assets -> Imagens, Fontes, Sons
+├── constants -> Constantes (Ex.: Cores, Configurações...)
+├── include -> Classes (Ex.: Jogador, Botão...)
+├── scripts
+├── main.py
+├── game.py
+├── paths.py
+├── README.md
+└── requirements.txt
+```
