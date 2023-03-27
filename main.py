@@ -1,13 +1,16 @@
 import pygame
 import sys
-
-pygame.init()
+import art
 
 # Importing constants
 from constants import colors, window
 
 # Include classes
 from include.button import menu_button
+
+art.tprint("H8 KOMBAT", font="small", chr_ignore=True)
+
+pygame.init()
 
 # Window setup
 WIN = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
@@ -18,6 +21,7 @@ FPS = 60
 
 BG = pygame.image.load("assets/ita.png")
 
+
 def draw_window():
     WIN.fill(colors.CYAN)
     pygame.display.update()
@@ -26,6 +30,7 @@ def draw_window():
 def get_font(size: int):
     return pygame.font.Font("assets/font.ttf", size)
 
+
 def menu():
     while True:
         WIN.blit(BG, (0, 0))
@@ -33,22 +38,26 @@ def menu():
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
         MENU_TEXT = get_font(80).render("MAIN MENU", True, "#b68f40")
-        MENU_RECT = MENU_TEXT.get_rect(center=(window.WIDTH/2, window.HEIGHT/4))
+        MENU_RECT = MENU_TEXT.get_rect(center=(window.WIDTH / 2, window.HEIGHT / 4))
 
-        PLAY_BUTTON = menu_button(text_input="PLAY", pos=(window.WIDTH/2, window.HEIGHT/2))
-        OPTIONS_BUTTON = menu_button(text_input="OPTIONS", pos=(window.WIDTH/2, window.HEIGHT/2 + 80))
-        QUIT_BUTTON = menu_button(text_input="QUIT", pos=(window.WIDTH/2, window.HEIGHT/2 + 160))
+        # Botões
+        PLAY_BUTTON = menu_button(text_input="PLAY", pos=(window.WIDTH / 2, window.HEIGHT / 2))
+        OPTIONS_BUTTON = menu_button(text_input="OPTIONS", pos=(window.WIDTH / 2, window.HEIGHT / 2 + 80))
+        QUIT_BUTTON = menu_button(text_input="QUIT", pos=(window.WIDTH / 2, window.HEIGHT / 2 + 160))
 
         WIN.blit(MENU_TEXT, MENU_RECT)
 
+        # Muda a cor do botão quando o mouse está em cima
         for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
             button.update(WIN)
-        
+
+        # Verifica se o botão foi clicado
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     print("Play game")
@@ -68,11 +77,10 @@ def main():
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False        
-        
+                run = False
+
         draw_window()
 
         menu()
-
 
     pygame.quit()

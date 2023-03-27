@@ -9,6 +9,11 @@ Este é um jogo de luta simples criado em Pygame.
 
 ### COMO EXECUTAR O JOGO:
 ```bash
+py game.py setup
+
+source .venv/bin/activate # Linux | MacOS
+.venv\Scripts\activate.bat # Windows
+
 py game.py run
 ```
 
