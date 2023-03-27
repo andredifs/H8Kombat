@@ -1,14 +1,11 @@
 import pygame
 import sys
-import art
 
 # Importing constants
 from constants import colors, window
 
 # Include classes
 from include.button import menu_button
-
-art.tprint("H8 KOMBAT", font="small", chr_ignore=True)
 
 pygame.init()
 

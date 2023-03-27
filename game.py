@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from paths import VENV
 
-from scripts import setup
+from scripts.setup import setup
 
 if __name__ == '__main__':
     if not VENV.is_dir():
@@ -29,7 +29,7 @@ if __name__ == '__main__':
         setup(setup_parser)
 
     if args.cmd == 'run':
-        __import__('scripts.run').run(run_parser)
+        __import__('scripts.run').run.run(run_parser)
 
     args = parser.parse_args()
 
