@@ -1,12 +1,14 @@
 import pygame
 import constants.movement
-from constants.colors import BLUE, RED
+from constants.colors import RED
+import constants.controls
 
 class Fighter():
-    def __init__(self, x, y, surface):
+    def __init__(self, x, y, surface, color):
         self.rect = pygame.Rect((x, y, 80, 180))  # create a rect of fighter
         self.surface: pygame.Surface = surface
         self.vel_y: float = 0
+        self.flip: bool = False
         self.jumping: bool = False
         self.attacking: bool = False
         self.attack_type: int = 0
@@ -15,6 +17,10 @@ class Fighter():
         self.defend_cooldown: int = 0
         self.health: int = 100
         self.target: Fighter  # the opponent
+        self.controls: dict
+
+        # color
+        self.color = color
 
     def move(self, screen_width, screen_height):
         if not self.target:
@@ -26,26 +32,25 @@ class Fighter():
 
         if self.attacking is False and self.defending is False:
             # defend
-            if key[pygame.K_s]:
-                self.defend()
+            if key[self.controls['defend']]:
+                self.defending = True
+                self.defend_cooldown = constants.movement.DEFEND_COOLDOWN
 
             # attack
-            if key[pygame.K_r] or key[pygame.K_t]:
-                if key[pygame.K_r]:
+            if key[self.controls['attack1']]:
+                if key[self.controls['attack1']]:
                     self.attack_type = 1
-                if key[pygame.K_t]:
-                    self.attack_type = 2
 
                 self.attack()
 
             # movement
-            if key[pygame.K_a]:
+            if key[self.controls['left']]:
                 dx = -constants.movement.SPEED_X
-            if key[pygame.K_d]:
+            if key[self.controls['right']]:
                 dx = constants.movement.SPEED_X
 
             # jump
-            if key[pygame.K_w]:
+            if key[self.controls['jump']]:
                 self.jump()
 
         # apply defend cooldown
@@ -75,9 +80,8 @@ class Fighter():
         self.attack_cooldown = constants.movement.ATTACK_COOLDOWN
 
         attacking_rect = pygame.Rect(
-            self.rect.centerx,
-            self.rect.y,
-            2 * self.rect.width,
+            self.rect.centerx - (2 * self.rect.width * self.flip),
+            self.rect.y, 2 * self.rect.width,
             self.rect.height
         )
 
@@ -103,6 +107,12 @@ class Fighter():
             self.jumping = False
             dy = screen_height - 110 - self.rect.bottom
 
+        # ensure players face each other
+        if self.target.rect.centerx > self.rect.centerx:
+            self.flip = False
+        else:
+            self.flip = True
+
         # apply gravity
         self.vel_y += constants.movement.GRAVITY
         dy += self.vel_y
@@ -112,7 +122,10 @@ class Fighter():
         self.rect.y += dy
 
     def draw(self):
-        pygame.draw.rect(self.surface, BLUE, self.rect)
+        pygame.draw.rect(self.surface, self.color, self.rect)
 
     def set_target(self, target):
         self.target = target
+
+    def set_controls(self, controls):
+        self.controls = controls

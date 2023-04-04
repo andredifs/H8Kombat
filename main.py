@@ -3,7 +3,8 @@ import sys
 
 # Importing constants
 from constants import window
-from constants.colors import BLACK, GREEN, GREY, RED, YELLOW
+from constants import colors
+from constants import controls
 
 # Include classes
 from include.button import menu_button
@@ -22,11 +23,13 @@ WIN_CHOICE = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
 WIN_GAME = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
 
 # Set the game clock
-FPS = 30
+FPS = 60
 
-BG_MENU = pygame.image.load("assets/ita.png")
+PICTURE_MENU = pygame.image.load("assets/ita.png")
+BG_MENU = pygame.transform.scale(PICTURE_MENU, (window.WIDTH, window.HEIGHT))
+PICTURE_GAME = pygame.image.load("assets/tatame.jpg")
+BG_GAME = pygame.transform.scale(PICTURE_GAME, (window.WIDTH, window.HEIGHT))
 # BG_CHAR = pygame.image.load("assets/ita.png")
-# BG_GAME = pygame.image.load("assets/ita.png")
 
 def get_font(size: int):
     return pygame.font.Font("assets/font.ttf", size)
@@ -77,19 +80,24 @@ def choice():
             if event == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        WIN_CHOICE.blit(BG_MENU, (0, 0))
+
+        WIN_CHOICE.blit(BG_GAME, (0, 0))
 
         pygame.display.update()
 
 # Create a window for game
 def game():
     # Create a two fighters for game
-    fighter_1 = Fighter(200, 310, WIN_GAME)
-    fighter_2 = Fighter(700, 310, WIN_GAME)
+    fighter_1 = Fighter(200, 310, WIN_GAME, colors.BLUE)
+    fighter_2 = Fighter(700, 310, WIN_GAME, colors.ORANGE)
 
     # Defining oponent
     fighter_1.set_target(fighter_2)
     fighter_2.set_target(fighter_1)
+
+    # Defining controls
+    fighter_1.set_controls(controls.PLAYER1)
+    fighter_2.set_controls(controls.PLAYER2)
 
     while True:
         for event in pygame.event.get():
@@ -97,7 +105,7 @@ def game():
                 pygame.quit()
                 sys.exit()
 
-        WIN_GAME.blit(BG_MENU, (0, 0))
+        WIN_GAME.blit(BG_GAME, (0, 0))
 
         # Player stats
         draw_health_bar(fighter_1.health, 20, 20)
@@ -105,7 +113,7 @@ def game():
 
         # Move
         fighter_1.move(window.WIDTH, window.HEIGHT)
-        # fighter_2.move()
+        fighter_2.move(window.WIDTH, window.HEIGHT)
 
         # Draw fighters
         fighter_1.draw()
@@ -134,12 +142,12 @@ def main(dev=False):
 # function for drawing fighter health bars
 def draw_health_bar(health, x, y):
     ratio = health / 100
-    pygame.draw.rect(WIN_GAME, BLACK, (x - 2, y - 2, 204, 34))
-    pygame.draw.rect(WIN_GAME, GREY, (x, y, 200, 30))
+    pygame.draw.rect(WIN_GAME, colors.BLACK, (x - 2, y - 2, 204, 34))
+    pygame.draw.rect(WIN_GAME, colors.GREY, (x, y, 200, 30))
 
     if health > 40:
-        pygame.draw.rect(WIN_GAME, GREEN, (x, y, 200 * ratio, 30))
+        pygame.draw.rect(WIN_GAME, colors.GREEN, (x, y, 200 * ratio, 30))
     elif health > 20:
-        pygame.draw.rect(WIN_GAME, YELLOW, (x, y, 200 * ratio, 30))
+        pygame.draw.rect(WIN_GAME, colors.YELLOW, (x, y, 200 * ratio, 30))
     else:
-        pygame.draw.rect(WIN_GAME, RED, (x, y, 200 * ratio, 30))
+        pygame.draw.rect(WIN_GAME, colors.RED, (x, y, 200 * ratio, 30))
