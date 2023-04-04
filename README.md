@@ -12,7 +12,7 @@ Este é um jogo de luta simples criado em Pygame.
 py game.py setup
 
 source .venv/bin/activate # Linux | MacOS
-.venv\Scripts\activate.bat # Windows
+.venv\Scripts\activate # Windows
 
 py game.py run
 ```
