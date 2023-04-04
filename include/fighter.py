@@ -11,6 +11,8 @@ class Fighter():
         self.attacking: bool = False
         self.attack_type: int = 0
         self.attack_cooldown: int = 0
+        self.defending: bool = False
+        self.defend_cooldown: int = 0
         self.health: int = 100
         self.target: Fighter  # the opponent
 
@@ -22,7 +24,20 @@ class Fighter():
 
         key = pygame.key.get_pressed()
 
-        if self.attacking is False:
+        if self.attacking is False and self.defending is False:
+            # defend
+            if key[pygame.K_s]:
+                self.defend()
+
+            # attack
+            if key[pygame.K_r] or key[pygame.K_t]:
+                if key[pygame.K_r]:
+                    self.attack_type = 1
+                if key[pygame.K_t]:
+                    self.attack_type = 2
+
+                self.attack()
+
             # movement
             if key[pygame.K_a]:
                 dx = -constants.movement.SPEED_X
@@ -33,14 +48,11 @@ class Fighter():
             if key[pygame.K_w]:
                 self.jump()
 
-            # attack
-            if key[pygame.K_r] or key[pygame.K_t]:
-                if key[pygame.K_r]:
-                    self.attack_type = 1
-                if key[pygame.K_t]:
-                    self.attack_type = 2
-
-                self.attack()
+        # apply defend cooldown
+        if self.defend_cooldown > 0:
+            self.defend_cooldown -= 1
+        else:
+            self.defending = False
 
         # apply attack cooldown
         if self.attack_cooldown > 0:
@@ -56,11 +68,11 @@ class Fighter():
             self.jumping = True
 
     def attack(self):
-        if self.attack_cooldown > 0:
+        if self.attack_cooldown > 0 or self.defend_cooldown > 0:
             return
 
         self.attacking = True
-        self.attack_cooldown = 60
+        self.attack_cooldown = constants.movement.ATTACK_COOLDOWN
 
         attacking_rect = pygame.Rect(
             self.rect.centerx,
@@ -69,10 +81,16 @@ class Fighter():
             self.rect.height
         )
 
-        if attacking_rect.colliderect(self.target.rect):
+        if attacking_rect.colliderect(self.target.rect) and self.target.defending is False:
             self.target.health -= 5
 
         pygame.draw.rect(self.surface, RED, attacking_rect)
+
+    def defend(self):
+        if self.attack_cooldown > 0 or self.defend_cooldown > 0:
+            return
+        self.defending = True
+        self.defend_cooldown = constants.movement.DEFEND_COOLDOWN
 
     def update_pos(self, dx, dy, screen_width, screen_height):
         # ensure player stays on screen
