@@ -23,6 +23,8 @@ if __name__ == '__main__':
         help='Run game',
     )
 
+    run_parser.add_argument('--dev', action='store_true')
+
     args = parser.parse_args()
 
     if args.cmd == 'setup':

@@ -1,11 +1,11 @@
 import pygame
 import constants.movement
 
-
 class Fighter():
     def __init__(self, x, y):
         self.rect = pygame.Rect((x, y, 80, 180))  # create a rect of fighter
         self.vel_y = 0
+        self.jumping = False
 
     def move(self, screen_width, screen_height):
         dx = 0
@@ -22,10 +22,13 @@ class Fighter():
 
         # jump
         if key[pygame.K_w]:
-            self.vel_y = - constants.movement.SPEED_Y
-        # apply GRAVITY
+            self.vel_y = -constants.movement.SPEED_Y
+            self.jumping = True
+
+        # apply gravity
         self.vel_y += constants.movement.GRAVITY
         dy += self.vel_y
+        print(dy)
 
         # ensure player stays on screen
         if self.rect.left + dx < 0:  # verifica se ao clicar, o nosso lado esquerdo saira da tela

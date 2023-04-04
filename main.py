@@ -109,8 +109,7 @@ def game():
         pygame.display.update()
 
 # Main function
-
-def main():
+def main(dev=False):
     clock = pygame.time.Clock()
     run = True
     while run:
@@ -118,8 +117,10 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-
-        menu()
+        if dev:
+            game()
+        else:
+            menu()
 
         pygame.display.update()
 
