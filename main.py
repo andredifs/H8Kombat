@@ -3,6 +3,7 @@ import sys
 
 # Importing constants
 from constants import window
+from constants.colors import BLACK, GREEN, GREY, RED, YELLOW
 
 # Include classes
 from include.button import menu_button
@@ -15,20 +16,13 @@ WIN_MENU = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
 pygame.display.set_caption(window.TITLE)
 
 # Window for choice chars
-
 WIN_CHOICE = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
 
 # Window for game
-
 WIN_GAME = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
 
-# Create a two fighters for game
-
-fighter_1 = Fighter(200, 310)
-fighter_2 = Fighter(700, 310)
-
 # Set the game clock
-FPS = 60
+FPS = 30
 
 BG_MENU = pygame.image.load("assets/ita.png")
 # BG_CHAR = pygame.image.load("assets/ita.png")
@@ -36,7 +30,6 @@ BG_MENU = pygame.image.load("assets/ita.png")
 
 def get_font(size: int):
     return pygame.font.Font("assets/font.ttf", size)
-
 
 def menu():
     while True:
@@ -78,7 +71,6 @@ def menu():
         pygame.display.update()
 
 # Create a window for choice of chars
-
 def choice():
     while True:
         for event in pygame.event.get():
@@ -90,21 +82,34 @@ def choice():
         pygame.display.update()
 
 # Create a window for game
-
 def game():
+    # Create a two fighters for game
+    fighter_1 = Fighter(200, 310, WIN_GAME)
+    fighter_2 = Fighter(700, 310, WIN_GAME)
+
+    # Defining oponent
+    fighter_1.set_target(fighter_2)
+    fighter_2.set_target(fighter_1)
+
     while True:
         for event in pygame.event.get():
             if event == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
         WIN_GAME.blit(BG_MENU, (0, 0))
-        # move
+
+        # Player stats
+        draw_health_bar(fighter_1.health, 20, 20)
+        draw_health_bar(fighter_2.health, 580, 20)
+
+        # Move
         fighter_1.move(window.WIDTH, window.HEIGHT)
         # fighter_2.move()
 
-        # draw fighters
-        fighter_1.draw(WIN_GAME)
-        fighter_2.draw(WIN_GAME)
+        # Draw fighters
+        fighter_1.draw()
+        fighter_2.draw()
 
         pygame.display.update()
 
@@ -125,3 +130,16 @@ def main(dev=False):
         pygame.display.update()
 
     pygame.quit()
+
+# function for drawing fighter health bars
+def draw_health_bar(health, x, y):
+    ratio = health / 100
+    pygame.draw.rect(WIN_GAME, BLACK, (x - 2, y - 2, 204, 34))
+    pygame.draw.rect(WIN_GAME, GREY, (x, y, 200, 30))
+
+    if health > 40:
+        pygame.draw.rect(WIN_GAME, GREEN, (x, y, 200 * ratio, 30))
+    elif health > 20:
+        pygame.draw.rect(WIN_GAME, YELLOW, (x, y, 200 * ratio, 30))
+    else:
+        pygame.draw.rect(WIN_GAME, RED, (x, y, 200 * ratio, 30))
