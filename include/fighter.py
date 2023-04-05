@@ -6,6 +6,7 @@ import constants.controls
 class Fighter():
     def __init__(self, x, y, surface, color):
         self.rect = pygame.Rect((x, y, 80, 180))  # create a rect of fighter
+        self.initial_pos = (x, y)
         self.surface: pygame.Surface = surface
         self.vel_y: float = 0
         self.flip: bool = False
@@ -16,8 +17,10 @@ class Fighter():
         self.defending: bool = False
         self.defend_cooldown: int = 0
         self.health: int = 100
-        self.target: Fighter  # the opponent
+        self.dead: bool = False
         self.controls: dict
+        self.target: Fighter  # the opponent
+        self.score: int = 0
 
         # color
         self.color = color
@@ -33,8 +36,7 @@ class Fighter():
         if self.attacking is False and self.defending is False:
             # defend
             if key[self.controls['defend']]:
-                self.defending = True
-                self.defend_cooldown = constants.movement.DEFEND_COOLDOWN
+                self.defend()
 
             # attack
             if key[self.controls['attack1']]:
@@ -86,7 +88,9 @@ class Fighter():
         )
 
         if attacking_rect.colliderect(self.target.rect) and self.target.defending is False:
-            self.target.health -= 5
+            self.target.health -= 10
+            if self.target.health == 0:
+                self.target.dead = True
 
         pygame.draw.rect(self.surface, RED, attacking_rect)
 
@@ -129,3 +133,16 @@ class Fighter():
 
     def set_controls(self, controls):
         self.controls = controls
+
+    def reset(self):
+        self.vel_y = 0
+        self.flip = False
+        self.jumping = False
+        self.attacking = False
+        self.attack_type = 0
+        self.attack_cooldown = 0
+        self.defending = False
+        self.defend_cooldown = 0
+        self.health = 100
+        self.dead = False
+        self.rect.x, self.rect.y = self.initial_pos

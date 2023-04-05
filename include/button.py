@@ -36,7 +36,7 @@ def menu_button(text_input, pos):
         None,
         pos,
         text_input,
-        font.SysFont("comicsans", 60),
+        font.Font("assets/font.ttf", 50),
         colors.BLUE,
         colors.CYAN
     )

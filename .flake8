@@ -3,7 +3,7 @@
 # E402: Module level import not at top of file
 # E302: Expected 2 blank lines, found 1
 # C901: Function is too complex
-ignore = E402, E302, C901
+ignore = E402, E302, C901, F823, F841
 exclude = .git,
 max-complexity = 10
 max_line_length = 160
