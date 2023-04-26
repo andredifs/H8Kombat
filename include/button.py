@@ -1,4 +1,4 @@
-from pygame import font
+import pygame
 from constants import colors
 
 class Button():
@@ -24,7 +24,7 @@ class Button():
 
     """
 
-    def __init__(self, image, pos, text_input, font, base_color, hovering_color):
+    def __init__(self, image, pos, text_input, font, base_color, hovering_color, size=None, selected=False):
         """
         Constructs all the necessary attributes for the Button object.
 
@@ -38,12 +38,15 @@ class Button():
 
         """
         self.image = image
+        self.image_outline = None
         self.x_pos = pos[0]
         self.y_pos = pos[1]
         self.font = font
+        self.selected = selected
         self.base_color, self.hovering_color = base_color, hovering_color
         self.text_input = text_input
         self.text = self.font.render(self.text_input, True, self.base_color)
+        self.size = size
         if self.image is None:
             self.image = self.text
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
@@ -58,7 +61,19 @@ class Button():
 
         """
         if self.image is not None:
+            # use size for image
+            if self.size is not None:
+                self.image = pygame.transform.scale(self.image, self.size)
+                self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+                self.image_outline = pygame.Surface((self.size[0] + 10, self.size[1] + 10))
+                if self.selected:
+                    self.image_outline.fill(self.hovering_color)
+                else:
+                    self.image_outline.fill(self.base_color)
+                screen.blit(self.image_outline, (self.x_pos - self.size[0] / 2 - 5, self.y_pos - self.size[1] / 2 - 5))
+
             screen.blit(self.image, self.rect)
+
         screen.blit(self.text, self.text_rect)
 
     def checkForInput(self, position):
@@ -89,6 +104,9 @@ class Button():
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
 
+        if self.selected and self.image_outline is not None:
+            self.image_outline.fill(self.hovering_color)
+
 def menu_button(text_input, pos):
     """
     Create a menu button object.
@@ -104,7 +122,28 @@ def menu_button(text_input, pos):
         None,
         pos,
         text_input,
-        font.Font("assets/font.ttf", 50),
+        pygame.font.Font("assets/font.ttf", 50),
         colors.BLUE,
         colors.CYAN
+    )
+
+def choice_button(image, size, text_input, pos, selected):
+    """
+    Create a choice button object.
+
+    :param image: The image displayed on the button.
+    :type image: pygame.Surface
+    :param pos: The position of the button on the screen.
+    :type pos: tuple[int, int]
+    :return: A Button object.
+    :rtype: Button
+    """
+    return Button(
+        image,
+        pos,
+        text_input,
+        pygame.font.Font("assets/font.ttf", 50),
+        colors.WHITE,
+        colors.CYAN,
+        size,
     )
