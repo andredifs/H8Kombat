@@ -17,5 +17,5 @@ PLAYER2 = {
     'right': pygame.K_RIGHT,
     'defend': pygame.K_DOWN,
     'attack1': pygame.K_RSHIFT,
-    'attack2': pygame.K_RCTRL,
+    'attack2': pygame.K_SEMICOLON,
 }

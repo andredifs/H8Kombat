@@ -3,9 +3,10 @@ import constants.movement
 import constants.controls
 
 class Fighter():
-    def __init__(self, x, y, surface, sprites):
+    def __init__(self, x, y, surface, sprites, size_y=330):
         self.rect = pygame.Rect((x, y, 250, 200))  # create a rect of fighter
         self.sprites: list[pygame.Surface] = sprites
+        self.size_y = size_y
         self.animations = self.load_sprites()
         self.update_time = pygame.time.get_ticks()
         self.action = 0  # 0 = idle, 1 = attack1, 2 = attack2
@@ -33,7 +34,7 @@ class Fighter():
         for sprite in self.sprites:
             temp_list = []
             for image in range(5):
-                temp_img = sprite.subsurface(image * 250, 0, 250, 330)
+                temp_img = sprite.subsurface(image * 250, 0, 250, self.size_y)
                 temp_img = pygame.transform.scale(temp_img, (250, 200))
                 temp_list.append(temp_img)
 
@@ -106,9 +107,9 @@ class Fighter():
         self.attack_cooldown = constants.movement.ATTACK_COOLDOWN
 
         attacking_rect = pygame.Rect(
-            self.rect.centerx - (2 * self.rect.width * self.flip),
+            self.rect.centerx - (self.rect.width / 2 * self.flip),
             self.rect.y,
-            2 * self.rect.width,
+            self.rect.width / 2,
             self.rect.height
         )
 

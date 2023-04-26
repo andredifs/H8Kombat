@@ -25,3 +25,9 @@ fighters = {
     "lula": lula_sheets,
     "quinze": quinze_sheets,
 }
+
+sizes = {
+    "anao": 330,
+    "lula": 440,
+    "quinze": 440,
+}

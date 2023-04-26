@@ -7,6 +7,7 @@ from constants import colors
 from constants import controls
 from constants import fight as fight_constants
 from constants.characters import fighters
+from constants.characters import sizes
 
 from include.fighter import Fighter
 from include.health_bar import HealthBar
@@ -61,12 +62,12 @@ class FightScreen():
 
         if dev:
             # Create a two fighters for game
-            self.fighter_1 = Fighter(100, 310, self.WIN, fighters.get("anao"))
-            self.fighter_2 = Fighter(800 - 180, 310, self.WIN, fighters.get("lula"))
+            self.fighter_1 = Fighter(100, 310, self.WIN, fighters.get("anao"), sizes.get("anao"))
+            self.fighter_2 = Fighter(800 - 180, 310, self.WIN, fighters.get("lula"), sizes.get("lula"))
 
         else:
-            self.fighter_1 = Fighter(100, 310, self.WIN, fighters.get(characters[0]))
-            self.fighter_2 = Fighter(800 - 180, 310, self.WIN, fighters.get(characters[1]))
+            self.fighter_1 = Fighter(100, 310, self.WIN, fighters.get(characters[0]), sizes.get(characters[0]))
+            self.fighter_2 = Fighter(800 - 180, 310, self.WIN, fighters.get(characters[1]), sizes.get(characters[1]))
 
         self.setup()
 
