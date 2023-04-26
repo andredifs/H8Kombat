@@ -33,17 +33,46 @@ BG_GAME = pygame.transform.scale(PICTURE_GAME, (window.WIDTH, window.HEIGHT))
 PICTURE_VICTORY = pygame.image.load("assets/fatality.jpg")
 BG_VICTORY = pygame.transform.scale(PICTURE_VICTORY, (window.WIDTH, window.HEIGHT))
 
+
 class MenuScreen():
-    # Botões
+    """
+    A class representing the main menu screen.
+
+    Attributes:
+    -----------
+    PLAY_BUTTON : object
+        A menu button object to start the game.
+    OPTIONS_BUTTON : object
+        A menu button object to open the options screen.
+    QUIT_BUTTON : object
+        A menu button object to quit the game.
+    MENU_MOUSE_POS : tuple
+        A tuple with the x and y positions of the mouse in the menu screen.
+
+    Methods:
+    --------
+    handle_events(self):
+        Handles the events in the main menu screen, such as mouse clicks and the window closing.
+
+    update(self):
+        Updates the graphics and buttons on the main menu screen.
+
+    draw(self):
+        Draws the main menu screen.
+    """
+    # Buttons
     PLAY_BUTTON = menu_button(text_input="PLAY", pos=(window.WIDTH / 2, window.HEIGHT / 2))
     OPTIONS_BUTTON = menu_button(text_input="OPTIONS", pos=(window.WIDTH / 2, window.HEIGHT / 2 + 80))
     QUIT_BUTTON = menu_button(text_input="QUIT", pos=(window.WIDTH / 2, window.HEIGHT / 2 + 160))
 
-    # Posição do mouse
+    # Mouse position
     MENU_MOUSE_POS = pygame.mouse.get_pos()
 
     def handle_events(self):
-        # Verifica se o botão foi clicado
+        """
+        Handles the events in the main menu screen, such as mouse clicks and the window closing.
+        """
+        # Check if button was clicked
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -59,6 +88,11 @@ class MenuScreen():
                     pygame.quit()
 
     def update(self):
+        """
+        Updates the menu screen with the latest changes, such as button colors and positions.
+
+        :return: None
+        """
         WIN.blit(BG_MENU, (0, 0))
 
         self.MENU_MOUSE_POS = pygame.mouse.get_pos()
@@ -68,7 +102,7 @@ class MenuScreen():
 
         WIN.blit(MENU_TEXT, MENU_RECT)
 
-        # Muda a cor do botão quando o mouse está em cima
+        # Changes the color of each button if the mouse is hovering over it, then updates its position.
         for button in [self.PLAY_BUTTON, self.OPTIONS_BUTTON, self.QUIT_BUTTON]:
             button.changeColor(self.MENU_MOUSE_POS)
             button.update(WIN)
@@ -76,9 +110,48 @@ class MenuScreen():
         pygame.display.update()
 
     def draw(self):
+        """
+        Draws the menu screen with its current settings.
+
+        :return: None
+        """
         pass
 
+
 class FightScreen():
+    """
+    A class representing the main game screen.
+
+    ...
+
+    Attributes
+    ----------
+    TEXT_SURFACE : pygame.Surface
+        A surface that represents the area where the text is displayed.
+    round_over : bool
+        A boolean that indicates if the round is over.
+    round_over_time : int
+        The time in milliseconds that the round has been over.
+    intro_count : int
+        An integer that counts down from 3 to 0 before the fight begins.
+    fighter_1 : Fighter
+        A Fighter object representing the first fighter in the game.
+    fighter_2 : Fighter
+        A Fighter object representing the second fighter in the game.
+    bar_1 : HealthBar
+        A HealthBar object representing the health bar of the first fighter.
+    bar_2 : HealthBar
+        A HealthBar object representing the health bar of the second fighter.
+
+    Methods
+    -------
+    handle_events():
+        Handles events that occur in the game, such as quitting.
+    update():
+        Updates the game screen, including the fighters' movements and health bars,
+        the countdown before the fight, and the victory image.
+    """
+
     TEXT_SURFACE = WIN.subsurface(pygame.Rect(0, 0, window.WIDTH, window.HEIGHT))
     round_over = False
     round_over_time = pygame.time.get_ticks()
@@ -100,11 +173,27 @@ class FightScreen():
     fighter_2.set_controls(controls.PLAYER2)
 
     def handle_events(self):
+        """
+        Handles events that occur in the game, such as quitting.
+        """
         for event in pygame.event.get():
             if event == pygame.QUIT:
                 pygame.quit()
 
     def update(self):
+        """
+        Update the state of the FightScreen.
+
+        This method updates the player's health bars, countdown timer,
+        players' position, checks for player defeat and displays victory image if
+        either player has a score of 2.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         # Player stats
         self.bar_1.update(self.fighter_1.health)
         self.bar_2.update(self.fighter_2.health)
@@ -144,6 +233,18 @@ class FightScreen():
         pygame.display.update()
 
     def draw(self):
+        """
+        Draw the game screen.
+
+        Draws the background image, fighters, health bars and player scores. If either fighter has reached 2 points,
+        it also displays a victory image.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         WIN.blit(BG_GAME, (0, 0))
 
         # Draw fighters
@@ -162,6 +263,15 @@ class FightScreen():
             WIN.blit(BG_VICTORY, (0, 0))
 
     def reset_fighters(self):
+        """
+        Reset both fighters to their initial state.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.fighter_1.reset()
         self.fighter_2.reset()
 
@@ -172,6 +282,17 @@ current_screen = menu_screen
 
 # Main function
 def main(dev=False):
+    """
+    Main game loop.
+
+    Handles events, draws the current screen, and updates the game state.
+
+    Args:
+        dev (bool): Optional parameter, default False. If True, runs the game in developer mode.
+
+    Returns:
+        None
+    """
     while True:
         current_screen.handle_events()
         current_screen.draw()
