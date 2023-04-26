@@ -15,6 +15,28 @@ LULA_IMG = pygame.image.load("assets/lula.png")
 QUINZE_IMG = pygame.image.load("assets/15.png")
 
 class ChoiceScreen():
+    """
+    A class representing the choice character screen.
+
+    Attributes:
+    -----------
+    PLAY_BUTTON : object
+        A menu button object to start the game.
+    MENU_MOUSE_POS : tuple
+        A tuple with the x and y positions of the mouse in the menu screen.
+
+    Methods:
+    --------
+    handle_events(self):
+        Handles the events in the main menu screen, such as mouse clicks and the window closing.
+
+    update(self):
+        Updates the graphics and buttons on the main menu screen.
+
+    draw(self):
+        Draws the main menu screen.
+    """
+
     def __init__(self, WIN):
         self.WIN = WIN
         self.selected_caracters = []

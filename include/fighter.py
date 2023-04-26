@@ -3,6 +3,47 @@ import constants.movement
 import constants.controls
 
 class Fighter():
+    """
+    A class to represent a fighter.
+
+    Attributes:
+        rect (pygame.Rect): The rectangle of the fighter's image.
+        sprites (list): The list of sprites to use for the fighter's animations.
+        size_y (int): The height of the fighter's sprites.
+        animations (list): The list of animations for the fighter.
+        update_time (int): The time at which the fighter's animation was last updated.
+        action (int): The current action of the fighter.
+        frame (int): The current frame of the fighter's animation.
+        image (pygame.Surface): The current image of the fighter.
+        initial_pos (tuple): The initial position of the fighter.
+        surface (pygame.Surface): The surface on which to display the fighter.
+        vel_y (float): The fighter's vertical velocity.
+        flip (bool): Whether the fighter is facing left or right.
+        jumping (bool): Whether the fighter is jumping.
+        attacking (bool): Whether the fighter is attacking.
+        attack_type (int): The type of attack the fighter is performing.
+        attack_cooldown (int): The time at which the fighter's attack cooldown ends.
+        defending (bool): Whether the fighter is defending.
+        defend_cooldown (int): The time at which the fighter's defend cooldown ends.
+        health (int): The fighter's health.
+        dead (bool): Whether the fighter is dead.
+        controls (dict): The fighter's controls.
+        target (Fighter): The fighter's target.
+        score (int): The fighter's score.
+
+    Methods:
+        load_sprites(): Loads the fighter's sprites.
+        update(): Updates the fighter's animation.
+        draw(): Draws the fighter on the screen.
+        move(): Moves the fighter.
+        jump(): Makes the fighter jump.
+        attack(): Makes the fighter attack.
+        defend(): Makes the fighter defend.
+        take_damage(damage): Makes the fighter take damage.
+        die(): Makes the fighter die.
+        reset(): Resets the fighter's attributes.
+    """
+
     def __init__(self, x, y, surface, sprites, size_y=330):
         self.rect = pygame.Rect((x, y, 250, 200))  # create a rect of fighter
         self.sprites: list[pygame.Surface] = sprites
