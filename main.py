@@ -1,29 +1,24 @@
 import pygame
-import sys
 
 # Importing constants
 from constants import window
 from constants import colors
 from constants import controls
+from constants import fight as fight_constants
+
+# Importing utils
+import utils
 
 # Include classes
 from include.button import menu_button
 from include.fighter import Fighter
+from include.health_bar import HealthBar
 
 pygame.init()
 
-# Window setup
-WIN_MENU = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
+# Windows
+WIN = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
 pygame.display.set_caption(window.TITLE)
-
-# Window for choice chars
-WIN_CHOICE = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
-
-# Window for game
-WIN_GAME = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
-
-# Window for victory
-WIN_VICTORY = pygame.display.set_mode((window.WIDTH, window.HEIGHT))
 
 # Set the game clock
 FPS = 60
@@ -38,76 +33,63 @@ BG_GAME = pygame.transform.scale(PICTURE_GAME, (window.WIDTH, window.HEIGHT))
 PICTURE_VICTORY = pygame.image.load("assets/fatality.jpg")
 BG_VICTORY = pygame.transform.scale(PICTURE_VICTORY, (window.WIDTH, window.HEIGHT))
 
-run = True
+class MenuScreen():
+    # Botões
+    PLAY_BUTTON = menu_button(text_input="PLAY", pos=(window.WIDTH / 2, window.HEIGHT / 2))
+    OPTIONS_BUTTON = menu_button(text_input="OPTIONS", pos=(window.WIDTH / 2, window.HEIGHT / 2 + 80))
+    QUIT_BUTTON = menu_button(text_input="QUIT", pos=(window.WIDTH / 2, window.HEIGHT / 2 + 160))
 
-def menu(dev=False):
-    global run
+    # Posição do mouse
+    MENU_MOUSE_POS = pygame.mouse.get_pos()
 
-    while run:
-        for event in pygame.event.get():
-            if event == pygame.QUIT:
-                quit()
-
-        WIN_MENU.blit(BG_MENU, (0, 0))
-
-        MENU_MOUSE_POS = pygame.mouse.get_pos()
-
-        MENU_TEXT = get_font(100).render("H8 Kombat", True, colors.WHITE)
-        MENU_RECT = MENU_TEXT.get_rect(center=(window.WIDTH / 2, window.HEIGHT / 4))
-
-        # Botões
-        PLAY_BUTTON = menu_button(text_input="PLAY", pos=(window.WIDTH / 2, window.HEIGHT / 2))
-        OPTIONS_BUTTON = menu_button(text_input="OPTIONS", pos=(window.WIDTH / 2, window.HEIGHT / 2 + 80))
-        QUIT_BUTTON = menu_button(text_input="QUIT", pos=(window.WIDTH / 2, window.HEIGHT / 2 + 160))
-
-        WIN_MENU.blit(MENU_TEXT, MENU_RECT)
-
-        # Muda a cor do botão quando o mouse está em cima
-        for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
-            button.changeColor(MENU_MOUSE_POS)
-            button.update(WIN_MENU)
-
+    def handle_events(self):
         # Verifica se o botão foi clicado
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                quit()
+                pygame.quit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    game()
+                if self.PLAY_BUTTON.checkForInput(self.MENU_MOUSE_POS):
+                    global current_screen
+                    current_screen = fight_screen
                     print("Play game")
-                if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                if self.OPTIONS_BUTTON.checkForInput(self.MENU_MOUSE_POS):
                     print("Open options")
-                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                if self.QUIT_BUTTON.checkForInput(self.MENU_MOUSE_POS):
                     pygame.quit()
-                    sys.exit()
+
+    def update(self):
+        WIN.blit(BG_MENU, (0, 0))
+
+        self.MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+        MENU_TEXT = utils.get_font(100).render("H8 Kombat", True, colors.WHITE)
+        MENU_RECT = MENU_TEXT.get_rect(center=(window.WIDTH / 2, window.HEIGHT / 4))
+
+        WIN.blit(MENU_TEXT, MENU_RECT)
+
+        # Muda a cor do botão quando o mouse está em cima
+        for button in [self.PLAY_BUTTON, self.OPTIONS_BUTTON, self.QUIT_BUTTON]:
+            button.changeColor(self.MENU_MOUSE_POS)
+            button.update(WIN)
 
         pygame.display.update()
 
-# Create a window for choice of chars
-def choice():
-    global run
+    def draw(self):
+        pass
 
-    while run:
-        for event in pygame.event.get():
-            if event == pygame.QUIT:
-                quit()
-
-        WIN_CHOICE.blit(BG_GAME, (0, 0))
-
-        pygame.display.update()
-
-# Create a window for game
-def game(dev=False):
-    global run
-
+class FightScreen():
+    TEXT_SURFACE = WIN.subsurface(pygame.Rect(0, 0, window.WIDTH, window.HEIGHT))
     round_over = False
+    round_over_time = pygame.time.get_ticks()
     intro_count = 3
-    ROUND_OVER_COOLDOWN = 500
 
     # Create a two fighters for game
-    fighter_1 = Fighter(100, 310, WIN_GAME, colors.BLUE)
-    fighter_2 = Fighter(800 - 180, 310, WIN_GAME, colors.ORANGE)
+    fighter_1 = Fighter(100, 310, WIN, colors.BLUE)
+    fighter_2 = Fighter(800 - 180, 310, WIN, colors.ORANGE)
+
+    bar_1 = HealthBar(fighter_1.health, 20, 20, WIN)
+    bar_2 = HealthBar(fighter_2.health, 580, 20, WIN)
 
     # Defining oponent
     fighter_1.set_target(fighter_2)
@@ -117,107 +99,80 @@ def game(dev=False):
     fighter_1.set_controls(controls.PLAYER1)
     fighter_2.set_controls(controls.PLAYER2)
 
-    while run:
+    def handle_events(self):
         for event in pygame.event.get():
             if event == pygame.QUIT:
-                quit()
+                pygame.quit()
 
-        TEXT_SURFACE = WIN_GAME.subsurface(pygame.Rect(0, 0, window.WIDTH, window.HEIGHT))
-        TEXT_SURFACE.fill(colors.BLACK)
-        WIN_GAME.blit(BG_GAME, (0, 0))
-
-        # Draw fighters
-        fighter_1.draw()
-        fighter_2.draw()
-
+    def update(self):
         # Player stats
-        health_bar(fighter_1.health, 20, 20)
-        health_bar(fighter_2.health, 580, 20)
-        draw_text(TEXT_SURFACE, f'P1: {fighter_1.score}', 30, colors.RED, 55, 70)
-        draw_text(TEXT_SURFACE, f'P2: {fighter_2.score}', 30, colors.RED, window.WIDTH - 55, 70)
+        self.bar_1.update(self.fighter_1.health)
+        self.bar_2.update(self.fighter_2.health)
 
         # update countdown
-        if intro_count >= 0:
-            text = str(intro_count) if intro_count > 0 else "FIGHT!"
+        if self.intro_count >= 0:
+            text = str(self.intro_count) if self.intro_count > 0 else "FIGHT!"
 
-            draw_text(TEXT_SURFACE, text, 100, colors.RED, window.WIDTH / 2, window.HEIGHT / 2)
+            utils.draw_text(WIN, text, 100, colors.RED, window.WIDTH / 2, window.HEIGHT / 2)
 
-            pygame.time.delay(1100)
-            intro_count -= 1
+            pygame.time.delay(1000)
+            self.intro_count -= 1
 
-        elif round_over is False:
-            fighter_1.move(window.WIDTH, window.HEIGHT)
-            fighter_2.move(window.WIDTH, window.HEIGHT)
+        elif self.round_over is False:
+            self.fighter_1.move(window.WIDTH, window.HEIGHT)
+            self.fighter_2.move(window.WIDTH, window.HEIGHT)
 
         # check for player defeat
-        if round_over is False:
-            if fighter_1.dead or fighter_2.dead:
-                alive = fighter_1 if not fighter_1.dead else fighter_2
+        if self.round_over is False:
+            if self.fighter_1.dead or self.fighter_2.dead:
+                alive = self.fighter_1 if not self.fighter_1.dead else self.fighter_2
                 alive.score += 1
-                round_over = True
-                round_over_time = pygame.time.get_ticks()
+                self.round_over = True
+                self.round_over_time = pygame.time.get_ticks()
 
-                reset_fighters([fighter_1, fighter_2])
+                self.reset_fighters()
 
-        elif pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
-            round_over = False
-            intro_count = 3
-            reset_fighters([fighter_1, fighter_2])
+        elif pygame.time.get_ticks() - self.round_over_time > fight_constants.ROUND_OVER_COOLDOWN:
+            self.round_over = False
+            self.intro_count = 3
+            self.reset_fighters()
 
         # display victory image
-        if (fighter_1.score == 2) or (fighter_2.score == 2):
-            WIN_VICTORY.blit(BG_VICTORY, (0, 0))
+        if (self.fighter_1.score == 2) or (self.fighter_2.score == 2):
+            WIN.blit(BG_VICTORY, (0, 0))
 
         pygame.display.update()
+
+    def draw(self):
+        WIN.blit(BG_GAME, (0, 0))
+
+        # Draw fighters
+        self.fighter_1.draw()
+        self.fighter_2.draw()
+
+        # Draw health bars
+        self.bar_1.draw()
+        self.bar_2.draw()
+
+        utils.draw_text(WIN, f'P1: {self.fighter_1.score}', 30, colors.RED, 55, 70)
+        utils.draw_text(WIN, f'P2: {self.fighter_2.score}', 30, colors.RED, window.WIDTH - 55, 70)
+
+        # display victory image
+        if (self.fighter_1.score == 2) or (self.fighter_2.score == 2):
+            WIN.blit(BG_VICTORY, (0, 0))
+
+    def reset_fighters(self):
+        self.fighter_1.reset()
+        self.fighter_2.reset()
+
+
+menu_screen = MenuScreen()
+fight_screen = FightScreen()
+current_screen = menu_screen
 
 # Main function
 def main(dev=False):
-    global run
-    clock = pygame.time.Clock()
-
-    while run:
-        clock.tick(FPS)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-        if dev:
-            game(dev)
-        else:
-            menu(dev)
-
-        pygame.display.update()
-
-    quit()
-
-# function for drawing fighter health bars
-def health_bar(health, x, y):
-    ratio = health / 100
-    pygame.draw.rect(WIN_GAME, colors.BLACK, (x - 2, y - 2, 204, 34))
-    pygame.draw.rect(WIN_GAME, colors.GREY, (x, y, 200, 30))
-
-    if health > 40:
-        color = colors.GREEN
-    elif health > 20:
-        color = colors.YELLOW
-    else:
-        color = colors.RED
-
-    pygame.draw.rect(WIN_GAME, color, (x, y, 200 * ratio, 30))
-
-def draw_text(surface: pygame.Surface, text, size, text_col, x, y):
-    img = get_font(size).render(text, True, text_col)
-    img_rect = img.get_rect(center=(x, y))
-    return surface.blit(img, img_rect)
-
-def get_font(size: int):
-    return pygame.font.Font("assets/font.ttf", size)
-
-def reset_fighters(fighter: list[Fighter]):
-    for fighter in fighter:
-        fighter.reset()
-
-def quit():
-    global run
-    run = False
-    pygame.quit()
-    sys.exit()
+    while True:
+        current_screen.handle_events()
+        current_screen.draw()
+        current_screen.update()
