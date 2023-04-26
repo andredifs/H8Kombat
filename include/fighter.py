@@ -1,44 +1,16 @@
 import pygame
 import constants.movement
-from constants.colors import RED
 import constants.controls
 
 class Fighter():
-    """A class representing a fighter in the game.
-
-    Attributes:
-        rect (pygame.Rect): A rectangle that represents the fighter's position and size.
-        initial_pos (tuple): A tuple of two integers representing the initial position of the fighter.
-        surface (pygame.Surface): The surface on which the fighter is drawn.
-        vel_y (float): The vertical velocity of the fighter.
-        flip (bool): A boolean value indicating whether the fighter is flipped horizontally.
-        jumping (bool): A boolean value indicating whether the fighter is currently jumping.
-        attacking (bool): A boolean value indicating whether the fighter is currently attacking.
-        attack_type (int): An integer representing the type of attack the fighter is performing.
-        attack_cooldown (int): The remaining time until the fighter can perform another attack.
-        defending (bool): A boolean value indicating whether the fighter is currently defending.
-        defend_cooldown (int): The remaining time until the fighter can stop defending.
-        health (int): The current health of the fighter.
-        dead (bool): A boolean value indicating whether the fighter is dead.
-        controls (dict): A dictionary containing the control mappings for the fighter.
-        target (Fighter): The opponent that the fighter is currently facing.
-        score (int): The current score of the fighter.
-        color (tuple): A tuple of three integers representing the RGB color values of the fighter.
-
-    Methods:
-        __init__(self, x, y, surface, color): Initializes a new instance of the Fighter class.
-    """
-
-    def __init__(self, x, y, surface, color):
-        """Initializes a new instance of the Fighter class.
-
-        Args:
-            x (int): The x-coordinate of the fighter's starting position.
-            y (int): The y-coordinate of the fighter's starting position.
-            surface (pygame.Surface): The surface on which the fighter will be drawn.
-            color (tuple): A tuple of three integers representing the RGB color values of the fighter.
-        """
-        self.rect = pygame.Rect((x, y, 80, 180))
+    def __init__(self, x, y, surface, sprites):
+        self.rect = pygame.Rect((x, y, 250, 200))  # create a rect of fighter
+        self.sprites: list[pygame.Surface] = sprites
+        self.animations = self.load_sprites()
+        self.update_time = pygame.time.get_ticks()
+        self.action = 0  # 0 = idle, 1 = attack1, 2 = attack2
+        self.frame = 0
+        self.image = self.animations[self.action][self.frame]
         self.initial_pos = (x, y)
         self.surface: pygame.Surface = surface
         self.vel_y: float = 0
@@ -54,17 +26,22 @@ class Fighter():
         self.controls: dict = {}
         self.target: Fighter = None
         self.score: int = 0
-        self.color = color
+
+    def load_sprites(self):
+        animation_list = []
+
+        for sprite in self.sprites:
+            temp_list = []
+            for image in range(5):
+                temp_img = sprite.subsurface(image * 250, 0, 250, 330)
+                temp_img = pygame.transform.scale(temp_img, (250, 200))
+                temp_list.append(temp_img)
+
+            animation_list.append(temp_list)
+
+        return animation_list
 
     def move(self, screen_width, screen_height):
-        """
-        This method moves the fighter according to the input controls.
-        Args:
-            screen_width (int): The width of the game screen.
-            screen_height (int): The height of the game screen.
-        Raises:
-            Exception: If the target is not defined.
-        """
         if not self.target:
             raise Exception('Target not defined')
 
@@ -79,9 +56,11 @@ class Fighter():
 
             # attack
             if key[self.controls['attack1']]:
-                if key[self.controls['attack1']]:
-                    self.attack_type = 1
+                self.attack_type = 1
+                self.attack()
 
+            if key[self.controls['attack2']]:
+                self.attack_type = 2
                 self.attack()
 
             # movement
@@ -128,7 +107,8 @@ class Fighter():
 
         attacking_rect = pygame.Rect(
             self.rect.centerx - (2 * self.rect.width * self.flip),
-            self.rect.y, 2 * self.rect.width,
+            self.rect.y,
+            2 * self.rect.width,
             self.rect.height
         )
 
@@ -136,8 +116,6 @@ class Fighter():
             self.target.health -= 10
             if self.target.health == 0:
                 self.target.dead = True
-
-        pygame.draw.rect(self.surface, RED, attacking_rect)
 
     def defend(self):
         """Defend method for the fighter.
@@ -190,23 +168,37 @@ class Fighter():
         self.rect.x += dx
         self.rect.y += dy
 
+    def update(self):
+        animation_cooldown = 200
+        # update image
+        self.image = self.animations[self.action][self.frame]
+
+        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
+            if self.attacking:
+                if self.attack_type == 1:
+                    self.update_action(1)
+                else:
+                    self.update_action(2)
+            else:
+                self.update_action(0)
+
+            if self.frame < 4:
+                self.frame += 1
+            else:
+                self.frame = 0
+
+            self.update_time = pygame.time.get_ticks()
+
     def draw(self):
         """Draws the fighter on the game screen.
 
         Returns:
             None
         """
-        pygame.draw.rect(self.surface, self.color, self.rect)
+        img = pygame.transform.flip(self.image, self.flip, False)
+        self.surface.blit(img, (self.rect.x, self.rect.y))
 
     def set_target(self, target):
-        """Set the opponent for the fighter.
-
-        Args:
-            target (Fighter): The opponent.
-
-        Returns:
-            None
-        """
         self.target = target
 
     def set_controls(self, controls):
@@ -219,6 +211,13 @@ class Fighter():
             None
         """
         self.controls = controls
+
+    def update_action(self, new_action):
+        # check if the new action is different to the previous one
+        if new_action != self.action:
+            self.action = new_action
+            self.frame_index = 0
+            self.update_time = pygame.time.get_ticks()
 
     def reset(self):
         """Reset the fighter's attributes.

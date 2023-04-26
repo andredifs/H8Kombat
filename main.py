@@ -23,6 +23,19 @@ pygame.display.set_caption(window.TITLE)
 # Set the game clock
 FPS = 60
 
+# Load sprites
+anao_sheets = [
+    pygame.image.load("assets/sprites/anao_movimento.png").convert_alpha(),
+    pygame.image.load("assets/sprites/anao_soco.png").convert_alpha(),
+    pygame.image.load("assets/sprites/anao_chute.png").convert_alpha(),
+]
+
+lula_sheets = [
+    pygame.image.load("assets/sprites/lula_movimento.png").convert_alpha(),
+    pygame.image.load("assets/sprites/lula_soco.png").convert_alpha(),
+    pygame.image.load("assets/sprites/lula_chute.png").convert_alpha(),
+]
+
 # Backgrounds
 PICTURE_MENU = pygame.image.load("assets/menu.png")
 BG_MENU = pygame.transform.scale(PICTURE_MENU, (window.WIDTH, window.HEIGHT))
@@ -158,8 +171,8 @@ class FightScreen():
     intro_count = 3
 
     # Create a two fighters for game
-    fighter_1 = Fighter(100, 310, WIN, colors.BLUE)
-    fighter_2 = Fighter(800 - 180, 310, WIN, colors.ORANGE)
+    fighter_1 = Fighter(100, 310, WIN, anao_sheets)
+    fighter_2 = Fighter(800 - 180, 310, WIN, lula_sheets)
 
     bar_1 = HealthBar(fighter_1.health, 20, 20, WIN)
     bar_2 = HealthBar(fighter_2.health, 580, 20, WIN)
@@ -210,6 +223,8 @@ class FightScreen():
         elif self.round_over is False:
             self.fighter_1.move(window.WIDTH, window.HEIGHT)
             self.fighter_2.move(window.WIDTH, window.HEIGHT)
+            self.fighter_1.update()
+            self.fighter_2.update()
 
         # check for player defeat
         if self.round_over is False:
@@ -293,6 +308,10 @@ def main(dev=False):
     Returns:
         None
     """
+    if dev:
+        global current_screen
+        current_screen = fight_screen
+
     while True:
         current_screen.handle_events()
         current_screen.draw()

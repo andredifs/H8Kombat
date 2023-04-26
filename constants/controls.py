@@ -8,6 +8,7 @@ PLAYER1 = {
     'right': pygame.K_d,
     'defend': pygame.K_s,
     'attack1': pygame.K_r,
+    'attack2': pygame.K_t,
 }
 
 PLAYER2 = {
@@ -16,4 +17,5 @@ PLAYER2 = {
     'right': pygame.K_RIGHT,
     'defend': pygame.K_DOWN,
     'attack1': pygame.K_RSHIFT,
+    'attack2': pygame.K_RCTRL,
 }
